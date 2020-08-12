@@ -36,7 +36,7 @@ var (
 		Long:  "Print version information of go-rabbitMQ app",
 		Run: func(command *cobra.Command, args []string) {
 			infoStr := strings.Builder{}
-			infoStr.WriteString(fmt.Sprintf("%s - WarPin Core Auth AWP Service version info:\n", app.AppName))
+			infoStr.WriteString(fmt.Sprintf("%s - Okiww Go RabbitMQ version info:\n", app.AppName))
 			infoStr.WriteString(fmt.Sprintf("Version:\t%s\n", app.AppVersion))
 			infoStr.WriteString(fmt.Sprintf("Commit Hash:\t%s\n", app.AppCommit))
 			infoStr.WriteString(fmt.Sprintf("Go Version:\t%s\n", app.BuildGoVersion))
