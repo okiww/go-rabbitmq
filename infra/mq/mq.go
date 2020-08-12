@@ -6,12 +6,6 @@ import (
 	"log"
 )
 
-type Queue struct {
-	Name      string // server confirmed or generated name
-	Messages  int    // count of messages not awaiting acknowledgment
-	Consumers int    // number of consumers receiving deliveries
-}
-
 type MQInterface interface {
 	Connect() error
 	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args map[string]interface{}) (amqp.Queue, error)
