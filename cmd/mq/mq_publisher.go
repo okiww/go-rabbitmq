@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	publisherCMD  = &cobra.Command{
+	publisherCMD = &cobra.Command{
 		Use:   "publish",
 		Short: "Example Publish Message",
 		Long:  "Example publish a message to mq",
@@ -24,16 +24,25 @@ func runPublisher(cmd *cobra.Command, args []string) error {
 
 	// initial MessageQueue
 	mq := mq.NewMQService(config.MQServer)
+
 	// connect to rabbitMQ
 	mq.Connect()
+
+	// set config QOS
+	mq.SetQOSCount(1)
+	mq.SetQOSSize(1)
+	mq.SetQOSGlobal(false)
+
+
+
 	// declare a queue
 	q, _ := mq.QueueDeclare(
 		"task_queue", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		false,        // durable
+		false,        // delete when unused
+		false,        // exclusive
+		false,        // no-wait
+		nil,          // arguments
 	)
 	// example publish message
 	body := "Hello World!"

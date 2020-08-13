@@ -9,11 +9,18 @@ import (
 )
 
 type MQInterface interface {
+	// MQ Method
 	Connect() error
 	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args map[string]interface{}) (amqp.Queue, error)
 	Publisher(exchanged, name string, mandatory, immediate bool, msg []byte) error
 	Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{})
 	Close() error
+
+	// QOS Method
+	SetQOSCount(i int) ConfigFunc
+	SetQOSSize(size int) ConfigFunc
+	SetQOSGlobal(global bool) ConfigFunc
+	QOS() error
 }
 
 type mqService struct {
@@ -21,6 +28,21 @@ type mqService struct {
 	conn     *amqp.Connection
 	channel  *amqp.Channel
 	QOSConf  ConfigQOS
+}
+
+func (m *mqService) QOS() error {
+	err := m.channel.Qos(
+		m.QOSConf.Count,
+		m.QOSConf.Size,
+		m.QOSConf.Global,
+	)
+
+	if err != nil {
+		log.Fatalf("%s: %s", "failed to set QOS", err)
+		return err
+	}
+	log.Printf("success set QOS")
+	return nil
 }
 
 func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) {
