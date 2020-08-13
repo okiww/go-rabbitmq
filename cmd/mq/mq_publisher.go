@@ -33,8 +33,6 @@ func runPublisher(cmd *cobra.Command, args []string) error {
 	mq.SetQOSSize(1)
 	mq.SetQOSGlobal(false)
 
-
-
 	// declare a queue
 	q, _ := mq.QueueDeclare(
 		"task_queue", // name
@@ -44,6 +42,7 @@ func runPublisher(cmd *cobra.Command, args []string) error {
 		false,        // no-wait
 		nil,          // arguments
 	)
+
 	// example publish message
 	body := "Hello World!"
 	p := publisher.NewPublisherMQ(mq)

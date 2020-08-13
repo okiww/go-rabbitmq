@@ -13,6 +13,7 @@ type consumer struct {
 	mq.MQInterface
 }
 
+// ConsumerMessage is for implement simple consumer
 func (c consumer) ConsumerMessage(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) {
 	forever := c.Consumer(
 		queue,

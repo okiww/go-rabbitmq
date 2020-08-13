@@ -13,6 +13,7 @@ type publisher struct {
 	mq.MQInterface
 }
 
+// PublishMessage is example for implement simple publish message
 func (p publisher) PublishMessage(exchanged, name string, mandatory, immediate bool, msg string) {
 	err := p.Publisher(
 		exchanged,
