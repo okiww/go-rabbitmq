@@ -34,6 +34,12 @@ func runConsumer(cmd *cobra.Command, args []string) error {
 		nil,     // arguments
 	)
 
+	// set config QOS
+	mq.SetQOSCount(1)
+	mq.SetQOSSize(1)
+	mq.SetQOSGlobal(false)
+	mq.QOS()
+
 	p := consumer.NewConsumerMQ(mq)
 	p.ConsumerMessage(
 		q.Name, // queue

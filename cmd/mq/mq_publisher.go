@@ -28,11 +28,6 @@ func runPublisher(cmd *cobra.Command, args []string) error {
 	// connect to rabbitMQ
 	mq.Connect()
 
-	// set config QOS
-	mq.SetQOSCount(1)
-	mq.SetQOSSize(1)
-	mq.SetQOSGlobal(false)
-
 	// declare a queue
 	q, _ := mq.QueueDeclare(
 		"task_queue", // name
