@@ -8,12 +8,14 @@ import (
 	"time"
 )
 
+type Type struct {}
+
 type MQInterface interface {
 	// MQ Method
 	Connect() error
 	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args map[string]interface{}) (amqp.Queue, error)
 	Publisher(exchanged, name string, mandatory, immediate bool, msg []byte) error
-	Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{})
+	Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) chan bool
 	Close() error
 
 	// QOS Method
@@ -45,7 +47,7 @@ func (m *mqService) QOS() error {
 	return nil
 }
 
-func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) {
+func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) chan bool{
 	msgs, err := m.channel.Consume(
 		queue,
 		consumer,
@@ -56,7 +58,7 @@ func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal
 		args,
 	)
 	if err != nil {
-		log.Fatalf("%s: %s", "failed to received a message", err)
+		log.Fatalf("%s: %s", "failed to register consumer", err)
 	}
 
 	forever := make(chan bool)
@@ -72,8 +74,7 @@ func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-forever
+	return forever
 }
 
 func (m *mqService) Close() error {

@@ -1,6 +1,9 @@
 package consumer
 
-import "go-rabbitmq/infra/mq"
+import (
+	"go-rabbitmq/infra/mq"
+	"log"
+)
 
 type Consumer interface {
 	ConsumerMessage(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{})
@@ -11,7 +14,7 @@ type consumer struct {
 }
 
 func (c consumer) ConsumerMessage(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) {
-	c.Consumer(
+	forever := c.Consumer(
 		queue,
 		consumer,
 		autoAck,
@@ -20,6 +23,9 @@ func (c consumer) ConsumerMessage(queue, consumer string, autoAck, exclusive, no
 		noWait,
 		args,
 	)
+
+	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	<-forever
 }
 
 func NewConsumerMQ(mqInterface mq.MQInterface) Consumer {
