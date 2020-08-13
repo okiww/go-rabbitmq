@@ -14,7 +14,7 @@ type publisher struct {
 }
 
 func (p publisher) PublishMessage(exchanged, name string, mandatory, immediate bool, msg string) {
-	err := p.Publish(
+	err := p.Publisher(
 		exchanged,
 		name,
 		mandatory,

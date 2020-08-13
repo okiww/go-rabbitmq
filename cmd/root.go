@@ -50,7 +50,8 @@ var (
 
 func init()  {
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(mq.ServeMQ())
+	rootCmd.AddCommand(mq.ServeMQPublisher())
+	rootCmd.AddCommand(mq.ServeMQConsumer())
 }
 
 // Execute run root command

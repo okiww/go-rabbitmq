@@ -1,15 +1,18 @@
 package mq
 
 import (
+	"bytes"
 	"github.com/streadway/amqp"
 	"go-rabbitmq/config"
 	"log"
+	"time"
 )
 
 type MQInterface interface {
 	Connect() error
 	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args map[string]interface{}) (amqp.Queue, error)
-	Publish(exchanged, name string, mandatory, immediate bool, msg []byte) error
+	Publisher(exchanged, name string, mandatory, immediate bool, msg []byte) error
+	Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{})
 	Close() error
 }
 
@@ -17,6 +20,38 @@ type mqService struct {
 	MQConfig config.MQConfiguration
 	conn     *amqp.Connection
 	channel  *amqp.Channel
+	QOSConf  ConfigQOS
+}
+
+func (m *mqService) Consumer(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args map[string]interface{}) {
+	msgs, err := m.channel.Consume(
+		queue,
+		consumer,
+		autoAck,
+		exclusive,
+		noLocal,
+		noWait,
+		args,
+	)
+	if err != nil {
+		log.Fatalf("%s: %s", "failed to received a message", err)
+	}
+
+	forever := make(chan bool)
+
+	go func() {
+		for d := range msgs {
+			log.Printf("Received a message: %s", d.Body)
+			dot_count := bytes.Count(d.Body, []byte("."))
+			t := time.Duration(dot_count)
+			time.Sleep(t * time.Second)
+			log.Printf("Done")
+			d.Ack(false)
+		}
+	}()
+
+	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	<-forever
 }
 
 func (m *mqService) Close() error {
@@ -50,7 +85,7 @@ func (m *mqService) QueueDeclare(
 	return q, nil
 }
 
-func (m *mqService) Publish(exchanged, name string, mandatory, immediate bool, msg []byte) error {
+func (m *mqService) Publisher(exchanged, name string, mandatory, immediate bool, msg []byte) error {
 	err := m.channel.Publish(
 		exchanged, // exchange
 		name,      // routing key

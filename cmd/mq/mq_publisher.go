@@ -10,16 +10,15 @@ import (
 )
 
 var (
-	config *configs.Configuration
-	mqCmd  = &cobra.Command{
+	publisherCMD  = &cobra.Command{
 		Use:   "publish",
 		Short: "Example Publish Message",
 		Long:  "Example publish a message to mq",
-		RunE:  run,
+		RunE:  runPublisher,
 	}
 )
 
-func run(cmd *cobra.Command, args []string) error {
+func runPublisher(cmd *cobra.Command, args []string) error {
 	// initial config
 	config := configs.InitConfig()
 
@@ -29,7 +28,7 @@ func run(cmd *cobra.Command, args []string) error {
 	mq.Connect()
 	// declare a queue
 	q, _ := mq.QueueDeclare(
-		"hello", // name
+		"task_queue", // name
 		false,   // durable
 		false,   // delete when unused
 		false,   // exclusive
@@ -51,7 +50,7 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// ServeMQ return instance of serve mq command object
-func ServeMQ() *cobra.Command {
-	return mqCmd
+// ServeMQPublisher return instance of serve mq command object
+func ServeMQPublisher() *cobra.Command {
+	return publisherCMD
 }
